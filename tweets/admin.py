@@ -1,48 +1,50 @@
 from django.contrib import admin
-from django.db.models import Q
 from .models import Tweet, Like
 
-class ElonMuskFilter(admin.SimpleListFilter):
-    title = 'Contains Elon Musk'
-    parameter_name = 'contains_elon_musk'
+
+class ElonFilter(admin.SimpleListFilter):
+
+    title = "Filter by like count"
+
+    parameter_name = "likes"
 
     def lookups(self, request, model_admin):
-        return (
-            ('yes', 'Contains Elon Musk'),
-            ('no', 'Does not contain Elon Musk'),
-        )
+        return [
+            ("elon", "Tweets with Elon"),
+            ("no_elon", "Tweets without Elon"),
+        ]
 
-    def queryset(self, request, queryset):
-        if self.value() == 'yes':
-            return queryset.filter(payload__icontains='Elon Musk')
-        if self.value() == 'no':
-            return queryset.exclude(payload__icontains='Elon Musk')
-        return queryset
+    def queryset(self, request, tweets):
+        likes = self.value()
+        if likes == "elon":
+            return tweets.filter(payload__contains='Elon Musk')
+        elif likes == "no_elon":
+            return tweets.exclude(payload__contains='Elon Musk')
+
 
 @admin.register(Tweet)
 class TweetAdmin(admin.ModelAdmin):
-    search_fields = (
-        "payload",
-        "user__username",
-    )
-    
+
     list_display = (
         "payload",
         "user",
         "like_count",
     )
-    
-    list_filter = (
-        "created_at",
-        ElonMuskFilter,  # Add the custom filter here
+
+    search_fields = (
+      "payload",
+      "user__username",
     )
+
+    list_filter = (
+      ElonFilter,
+      "created_at",
+    )
+
 
 @admin.register(Like)
 class LikeAdmin(admin.ModelAdmin):
-    search_fields = (
-        "user__username",
-    )
-    
-    list_filter = (
-        "created_at",
-    )
+
+    search_fields = ("user__username", )
+
+    list_filter = ("created_at", )
