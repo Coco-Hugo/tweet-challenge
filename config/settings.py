@@ -132,3 +132,13 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    # List of methods rest framework uses to find out who the user is. It has 1 method by default and will hand over the result to request.user
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # Browser will use this by default to figure out the user
+        'rest_framework.authentication.SessionAuthentication',
+        # Custom authentication: apps like postman should use this for auth becuase it doesn't have cookies
+        'config.authentication.UsernameAuthentication'
+    ]
+}
